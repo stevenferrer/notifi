@@ -1,0 +1,80 @@
+Notification service
+
+Requirements
+- Creating and testing callbacks - high
+	- Test using webhook.site
+	- Setting and testing could be separate endpoints?
+	- Flag to indicate whether the set url for an event is active? Not sure if necessary
+- Send notification - high
+	- Indicate pros and cons of choices
+	- Will probably need a queue here?
+		- Use a separate (durable) queue or just implement a queue in RDBMS?
+		- Or use rdbms alongside the queue?
+	- Separate service to create/initiate notification?
+- Send notifications only once (idempotency) - high
+	- Not sure how to implement it yet
+- Generating API and callback token - medium
+	- API token for interacting with the notification API
+	- Callback token for authentication of callback request
+- Notification retries on failure - medium
+	- Exponential back-off
+	- If failed, send it back to the queue?
+	- Other techniques??
+	- Pre-defined interval?
+- Manually retrying failed notifications - minor
+	- 
+
+Assumptions:
+- There will be a separate service that will call the notification service. This service will provide the payload for the notification.
+- Other services will call the notification service and provided the actual payload (event name, user api token, data)
+
+Some questions:
+- Do we have a predefined list of event/callback types? Or can the user set it's own event name? Hard-coded events vs custom events, pros and cons
+- Should we have a separate callback and API key? Separate api and callback token
+
+Questions #2
+- Should we restrict one event/callback type per user?
+- Have a dedicated callback types table?
+
+
+Sample endpoints (tentative)
+- Token endpoint - for generating API and callback token and retrieving tokens
+	- Visualize the flow, pros and cons of having 2-step process
+	- Another approach is to have the admin generate API Key
+	- POST: /token - generate api and callback token - PUBLIC
+		- only return api token? Or include a callback token?
+		- present intention why this is needed
+	- GET: /token/me - retrieve api and callback token, for checking identity
+		- check this endpoint for the callback token?
+- Callbacks endpoint - for creating and retrieving callbacks
+	- POST: /callbacks - create a callback (subscribe to an event)
+	- GET: /callbacks - list all defined callbacks
+	- POST: /callbacks/:id – do a test send on callback
+- Notifications endpoint - for creating and retrieving notifications
+	- POST: /notifications - create notification request (save and send)
+	- GET: /notifications/:id - check detailed notification status
+	- GET: /notifications - list of notifications
+
+Notes:
+    • Expected response and status 
+    • Use RESTful endpoints
+    • Use swagger / markdown for API documentation
+    • Diagram preferences? 
+        ◦ Flowchart 
+        ◦ Sequence diagrams
+
+
+https://mermaid-js.github.io/mermaid/#/
+https://app.diagrams.net/ - draw.
+
+
+
+
+
+Flows
+    • Notifications
+        ◦ Creating a notification
+        ◦ Sending a notification
+    • Callbacks
+        ◦ Creating a callback
+        ◦ Testing a callback
